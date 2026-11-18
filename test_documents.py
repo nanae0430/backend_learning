@@ -149,11 +149,14 @@ def test_create_document_valid_title(client, test_user, db_connection, title):
         assert document.title == title
 
 
-def test_create_document_invalid_user(client):
-    invaid_user = 2**63 - 1
+def test_create_document_invalid_user(client, test_user):
+    invalid_user = 2**63 - 1
     response = client.post(
-        "/documents", json={"user_id": invaid_user, "title": "Foreign Key Test"}
+        "/documents", json={"user_id": invalid_user, "title": "Foreign Key Test"}
     )
 
     assert response.status_code == 400
     assert response.json()["detail"] == "Database constraint violation"
+    response = client.post(
+        "/documents", json={"user_id": test_user, "title": "Foreign Key Test"}
+    )

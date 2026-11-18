@@ -17,19 +17,16 @@ def cached_search(query: str):
 
     value = r.get(key)
 
-    # 2. 如果缓存存在
-    #    打印 "Cache Hit"
-    #    返回缓存结果
     if value is None:
         print("Cache Miss")
+        result = f"Search result for {query}"
+        r.set(key, result, ex=30)
+        return result
+
     else:
         print("Cache Hit")
-    # 3. 如果缓存不存在
-    #    打印 "Cache Miss"
+        return value
 
-    result = f"Search result for {query}"
 
-    # 4. 将 result 写入 Redis，30 秒过期
-    r.set(f"search:{query}", result)
-    # 5. 返回 result
-    return result
+print(cached_search("Transformer"))
+print(cached_search("Transformer"))
