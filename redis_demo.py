@@ -1,4 +1,4 @@
-import redis
+import redis, json
 
 r = redis.Redis(
     host="localhost",
@@ -13,19 +13,20 @@ print(r.ping())
 def cached_search(query: str):
     key = f"search:{query}"
 
-    # 1. 从 Redis 读取 key
-
     value = r.get(key)
 
-    if value is None:
-        print("Cache Miss")
-        result = f"Search result for {query}"
-        r.set(key, result, ex=30)
-        return result
-
-    else:
+    if value is not None:
         print("Cache Hit")
-        return value
+        return json.loads(value)
+
+    print("Cache Miss")
+    result = {
+        "query": query,
+        "top_k": 5,
+        "results": [],
+    }
+    r.set(key, json.dumps(result), ex=30)
+    return result
 
 
 print(cached_search("Transformer"))
