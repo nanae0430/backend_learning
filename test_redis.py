@@ -45,8 +45,6 @@ def test_cached_hit(monkeypatch):
 
     results = redis_demo.cached_search("Transformer", 5)
 
-    assert results["query"] == cached_data["query"]
-    assert results["top_k"] == cached_data["top_k"]
-    assert results["results"] == cached_data["results"]
+    assert results == cached_data
 
     assert set_calls == []
