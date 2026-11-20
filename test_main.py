@@ -1,5 +1,4 @@
 import main
-from pytest import fixture
 
 
 def test_health(client):
@@ -11,7 +10,7 @@ def test_health(client):
 
 def test_search(client, monkeypatch):
     def fake_cached_search(query, top_k):
-        return {"query": query, "top_k": top_k, "result": []}
+        return {"query": query, "top_k": top_k, "results": []}
 
     monkeypatch.setattr(main, "cached_search", fake_cached_search)
 
