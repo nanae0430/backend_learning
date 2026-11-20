@@ -10,6 +10,7 @@ from schemas import (
     DocumentCreate,
     DocumentUpdate,
 )
+from redis_demo import cached_search
 
 app = FastAPI()
 
@@ -26,7 +27,7 @@ def health():
 
 @app.get("/search")
 def search(query: str, top_k: int = 5):
-    return {"query": query, "top_k": top_k, "results": []}
+    return cached_search(query, top_k)
 
 
 @app.get("/documents/{doc_id}", response_model=DocumentResponse)

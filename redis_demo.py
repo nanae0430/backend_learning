@@ -7,11 +7,9 @@ r = redis.Redis(
     decode_responses=True,
 )
 
-print(r.ping())
 
-
-def cached_search(query: str):
-    key = f"search:{query}"
+def cached_search(query: str, top_k: int = 5):
+    key = f"search:{query}:{top_k}"
 
     value = r.get(key)
 
@@ -22,12 +20,15 @@ def cached_search(query: str):
     print("Cache Miss")
     result = {
         "query": query,
-        "top_k": 5,
+        "top_k": top_k,
         "results": [],
     }
     r.set(key, json.dumps(result), ex=30)
     return result
 
 
-print(cached_search("Transformer"))
-print(cached_search("Transformer"))
+if __name__ == "__main__":
+    print(r.ping())
+    print(cached_search("Transformer", 5))
+    print(cached_search("Transformer", 10))
+    print(cached_search("Transformer", 5))
