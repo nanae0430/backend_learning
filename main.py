@@ -11,6 +11,7 @@ from schemas import (
     DocumentUpdate,
 )
 from redis_demo import cached_search
+import asyncio
 
 app = FastAPI()
 
@@ -91,3 +92,9 @@ def update_document(
     db.commit()
     db.refresh(document)
     return document
+
+
+@app.get("/delay")
+async def delay():
+    await asyncio.sleep(2)
+    return {"message": "done"}
