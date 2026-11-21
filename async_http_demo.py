@@ -16,7 +16,7 @@ async def main():
     start = time.perf_counter()
 
     async with httpx.AsyncClient() as client:
-        asyncio.gather(fetch(client, "A"), fetch(client, "B"))
+        await asyncio.gather(fetch(client, "A"), fetch(client, "B"))
 
     elapsed = time.perf_counter() - start
     print(f"Elapsed: {elapsed:.2f}s")

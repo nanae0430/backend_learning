@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Response, Depends
+from fastapi import FastAPI, HTTPException, Response, Depends, BackgroundTasks
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from database import get_db
@@ -11,7 +11,7 @@ from schemas import (
     DocumentUpdate,
 )
 from redis_demo import cached_search
-import asyncio
+import asyncio, time
 
 app = FastAPI()
 
@@ -98,3 +98,17 @@ def update_document(
 async def delay():
     await asyncio.sleep(2)
     return {"message": "done"}
+
+
+def process_document(doc_id: int):
+    print(f"doc[{doc_id}] starts processing")
+    time.sleep(3)
+    print(f"doc[{doc_id}] ends processing")
+
+
+@app.post("/documents/process")
+def start_processing(doc_id: int, background_tasks: BackgroundTasks):
+
+    background_tasks.add_task(process_document, doc_id)
+
+    return {"message": "Task accepeted", "doc_id": doc_id}
