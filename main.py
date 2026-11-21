@@ -101,14 +101,26 @@ async def delay():
 
 
 def process_document(doc_id: int):
+    task_status[doc_id] = "RUNNING"
     print(f"doc[{doc_id}] starts processing")
     time.sleep(3)
     print(f"doc[{doc_id}] ends processing")
+    task_status[doc_id] = "SUCCESS"
 
 
-@app.post("/documents/process")
+task_status = {}
+
+
+@app.post("/documents/process", status_code=202)
 def start_processing(doc_id: int, background_tasks: BackgroundTasks):
 
     background_tasks.add_task(process_document, doc_id)
+    task_status[doc_id] = "PENDING"
+    return {"message": "Task accepted", "doc_id": doc_id}
 
-    return {"message": "Task accepeted", "doc_id": doc_id}
+
+@app.get("/documents/process/{doc_id}")
+def get_process_status(doc_id: int):
+    if doc_id not in task_status:
+        raise HTTPException(404, detail="Document not found")
+    return {"doc_id": doc_id, "status": task_status[doc_id]}
