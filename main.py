@@ -11,7 +11,7 @@ from schemas import (
     DocumentUpdate,
 )
 from redis_demo import r, cached_search
-import asyncio, time, json
+import asyncio, time
 
 app = FastAPI()
 
@@ -109,9 +109,6 @@ def process_document(doc_id: int):
     r.set(f"task:{doc_id}:status", "SUCCESS", ex=3600)
 
 
-task_status = {}
-
-
 @app.post("/documents/process", status_code=202)
 def start_processing(doc_id: int, background_tasks: BackgroundTasks):
 
@@ -123,6 +120,6 @@ def start_processing(doc_id: int, background_tasks: BackgroundTasks):
 @app.get("/tasks/{doc_id}")
 def get_task_status(doc_id: int):
     status = r.get(f"task:{doc_id}:status")
-    if status:
+    if status is None:
         raise HTTPException(404, detail="Document not found")
     return {"doc_id": doc_id, "status": status}
